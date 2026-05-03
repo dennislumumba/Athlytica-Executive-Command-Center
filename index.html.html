@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Athlytica Executive Command Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#120B12;
+      --surface:#111827;
+      --surface-2:#0f1724;
+      --surface-3:#1f2937;
+      --text:#f3f4f6;
+      --muted:#94a3b8;
+      --line:rgba(148,163,184,.16);
+      --blue:#08D9FF;
+      --blue-soft:rgba(8,217,255,.12);
+      --gold:#FFB888;
+      --gold-soft:rgba(255,184,136,.14);
+      --green:#22c55e;
+      --amber:#f59e0b;
+      --red:#ef4444;
+      --purple:#a78bfa;
+      --shadow:0 14px 40px rgba(0,0,0,.35);
+      --radius:20px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:radial-gradient(circle at top left, rgba(8,217,255,.09), transparent 28%), radial-gradient(circle at top right, rgba(255,184,136,.08), transparent 24%), var(--bg); color:var(--text); font-family:Inter,system-ui,sans-serif;}
+    body{padding:24px}
+    .wrap{max-width:1440px;margin:0 auto;display:grid;gap:18px}
+    .topbar,.card{background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01)); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow)}
+    .topbar{padding:20px 22px; display:grid; grid-template-columns:1.7fr 1fr; gap:18px; align-items:center}
+    .eyebrow{display:inline-flex;gap:8px;align-items:center; font-size:12px; text-transform:uppercase; letter-spacing:.18em; color:var(--blue)}
+    .eyebrow .dot{width:8px;height:8px;border-radius:999px;background:var(--blue);box-shadow:0 0 18px var(--blue)}
+    h1{margin:10px 0 10px;font-size:clamp(28px,4vw,42px);line-height:1.02}
+    .sub{color:var(--muted);max-width:860px;line-height:1.5}
+    .brandline{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .pill{padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid var(--line);color:#dbeafe;font-size:12px}
+    .pill.gold{color:var(--gold);background:var(--gold-soft);border-color:rgba(255,184,136,.2)}
+    .top-controls{display:grid;gap:12px}
+    .control-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .control{padding:14px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+    .control label,.mini-label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:8px}
+    select,.toggle{width:100%;background:var(--surface);border:1px solid var(--line);color:var(--text);padding:12px 14px;border-radius:12px;font:600 14px Inter}
+    .status-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .status{padding:14px;border-radius:16px;background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));border:1px solid var(--line)}
+    .status b{display:block;font-size:22px;margin-top:8px}
+    .mono{font-family:'JetBrains Mono',monospace}
+
+    .metric-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+    .metric{padding:18px;min-height:140px;position:relative;overflow:hidden}
+    .metric::after{content:'';position:absolute;inset:auto -30px -30px auto;width:110px;height:110px;border-radius:999px;background:radial-gradient(circle, rgba(8,217,255,.16), transparent 62%);pointer-events:none}
+    .metric.gold::after{background:radial-gradient(circle, rgba(255,184,136,.16), transparent 62%)}
+    .metric .label{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+    .metric .value{font-size:30px;font-weight:800;margin:14px 0 8px}
+    .metric .delta{display:inline-flex;gap:8px;align-items:center;font-size:13px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.05)}
+    .delta.up{color:#7dd3fc}
+    .delta.good{color:#86efac}
+    .delta.warn{color:#fcd34d}
+    .delta.bad{color:#fca5a5}
+
+    .layout{display:grid;grid-template-columns:1.3fr .9fr;gap:18px}
+    .stack{display:grid;gap:18px}
+    .card{padding:18px}
+    .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+    .card-head h2{margin:0;font-size:18px}
+    .card-head p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.45}
+    .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+    .legend span{display:inline-flex;gap:8px;align-items:center}
+    .legend i{display:inline-block;width:10px;height:10px;border-radius:999px}
+    svg{width:100%;height:auto;display:block}
+
+    .twocol{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .map-wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:12px;align-items:center}
+    .map-list{display:grid;gap:10px}
+    .facility{padding:12px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid var(--line)}
+    .facility .top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+    .facility small{color:var(--muted)}
+    .bar{height:9px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:10px}
+    .bar > span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--blue),#65f0ff)}
+    .bar.gold > span{background:linear-gradient(90deg,var(--gold),#ffd4b4)}
+    .bar.purple > span{background:linear-gradient(90deg,var(--purple),#c4b5fd)}
+    .ring-box{display:grid;grid-template-columns:200px 1fr;gap:14px;align-items:center}
+    .ring-meta{display:grid;gap:10px}
+    .ring-meta .big{font-size:30px;font-weight:800}
+    .kpi-stack{display:grid;gap:10px}
+    .kpi-line{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted)}
+
+    .bottom-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px}
+    .schema-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .schema{padding:14px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+    .schema h3{margin:0 0 10px;font-size:14px;color:#e5e7eb}
+    .schema ul{margin:0;padding-left:18px;color:var(--muted);line-height:1.5;font-size:13px}
+    .table{width:100%;border-collapse:collapse;font-size:13px}
+    .table th,.table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    .table th{color:#cbd5e1;font-size:12px;text-transform:uppercase;letter-spacing:.12em}
+    .badge{display:inline-flex;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700}
+    .verified{background:rgba(34,197,94,.12);color:#86efac}
+    .unverified{background:rgba(239,68,68,.12);color:#fca5a5}
+    .pending{background:rgba(245,158,11,.14);color:#fcd34d}
+    .gold-badge{background:var(--gold-soft);color:var(--gold)}
+    .purple-badge{background:rgba(167,139,250,.14);color:#c4b5fd}
+    details{border:1px solid var(--line);border-radius:16px;padding:14px;background:rgba(255,255,255,.025)}
+    summary{cursor:pointer;font-weight:700}
+    .note{margin-top:10px;color:var(--muted);font-size:13px;line-height:1.55}
+    .trust-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+    .trust-step{padding:14px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+    .trust-step strong{display:block;margin-bottom:6px}
+    .trust-step small{display:block;color:var(--muted);line-height:1.45}
+
+    @media (max-width:1200px){
+      .metric-grid{grid-template-columns:repeat(3,1fr)}
+      .layout,.bottom-grid,.topbar,.twocol,.map-wrap,.ring-box{grid-template-columns:1fr}
+      .schema-grid,.trust-grid{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width:780px){
+      body{padding:14px}
+      .metric-grid{grid-template-columns:1fr 1fr}
+      .control-grid,.status-strip,.schema-grid,.trust-grid{grid-template-columns:1fr}
+    }
+    @media (max-width:560px){
+      .metric-grid{grid-template-columns:1fr}
+      .value,.metric .value{font-size:26px}
+      .topbar,.card{border-radius:16px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="topbar">
+      <div>
+        <span class="eyebrow"><span class="dot"></span> Sovereign Analyst / Athlytica BI Suite</span>
+        <h1>The Athlytica Command Center</h1>
+        <div class="sub">A mobile-responsive executive dashboard prototype for sports league operators and institutional investors. This revised build upgrades the trust logic from simple GPS fencing to Athlytica’s current layered protocol: authorized training nodes, 10-minute dwell initialization, 50m dual-ping handshake, device fingerprinting, and server-side UTC timestamps.</div>
+        <div class="brandline">
+          <span class="pill">Athlytica Carbon #120B12</span>
+          <span class="pill">Deep Charcoal #111827</span>
+          <span class="pill">Electric Blue #08D9FF</span>
+          <span class="pill gold">Verification Gold #FFB888</span>
+        </div>
+      </div>
+      <div class="top-controls">
+        <div class="control-grid">
+          <div class="control">
+            <label for="roleSelect">View permission</label>
+            <select id="roleSelect">
+              <option value="executive">Executive / League Director</option>
+              <option value="coach">Coach / Squad Scope</option>
+            </select>
+          </div>
+          <div class="control">
+            <label for="coachSelect">Coach scope</label>
+            <select id="coachSelect"></select>
+          </div>
+        </div>
+        <div class="status-strip">
+          <div class="status"><span class="mini-label">Data mode</span><b>Mock Live</b><span class="mono" id="syncTime"></span></div>
+          <div class="status"><span class="mini-label">Trust layer</span><b>Node + Dual Ping</b><span class="mono">500m node fence · 50m handshake</span></div>
+          <div class="status"><span class="mini-label">Security anchor</span><b>Device + UTC</b><span class="mono">IMEI/MAC lock · server time</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="metric-grid" id="metricGrid"></section>
+
+    <section class="layout">
+      <div class="stack">
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <h2>Yield Variance Tracker</h2>
+              <p>Actual revenue is benchmarked against the Athlytica operating target of <span class="mono">KES 5,000/hr</span>. The chart combines monthly actual yield, benchmarked revenue, and attainment.</p>
+            </div>
+            <div class="legend">
+              <span><i style="background:var(--blue)"></i> Actual revenue</span>
+              <span><i style="background:var(--gold)"></i> Budget revenue</span>
+              <span><i style="background:var(--purple)"></i> Attainment %</span>
+            </div>
+          </div>
+          <svg id="yieldChart" viewBox="0 0 760 330" aria-label="Yield variance chart"></svg>
+        </article>
+
+        <div class="twocol">
+          <article class="card">
+            <div class="card-head">
+              <div>
+                <h2>Integrity Node Map</h2>
+                <p>Trust density across Athlytica authorized training nodes, centered on The Summit and The Ridge. Bubble intensity reflects fully verified dual-ping sessions.</p>
+              </div>
+              <span class="badge gold-badge">Node registry view</span>
+            </div>
+            <div class="map-wrap">
+              <svg id="heatmap" viewBox="0 0 480 310" aria-label="Regional integrity heatmap"></svg>
+              <div class="map-list" id="facilityList"></div>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-head">
+              <div>
+                <h2>360-Athlete Radar</h2>
+                <p>Pentagon model covering Technical Skill, Explosive Power, Agility, IQ, and Discipline.</p>
+              </div>
+              <span class="badge verified" id="athleteSeal">Verified seal</span>
+            </div>
+            <svg id="radarChart" viewBox="0 0 440 320" aria-label="Athlete radar chart"></svg>
+          </article>
+        </div>
+      </div>
+
+      <div class="stack">
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <h2>Consistency Ring</h2>
+              <p>Rolling 90-day attendance and verification adherence for the currently selected scope.</p>
+            </div>
+            <span class="badge pending" id="consistencyBadge">Rolling 90-day</span>
+          </div>
+          <div class="ring-box">
+            <svg id="consistencyRing" viewBox="0 0 220 220" aria-label="Consistency ring"></svg>
+            <div class="ring-meta">
+              <div>
+                <div class="mini-label">Verified attendance</div>
+                <div class="big" id="ringPercent">0%</div>
+              </div>
+              <div class="kpi-stack">
+                <div>
+                  <div class="kpi-line"><span>Verified sessions</span><span class="mono" id="verified90">0</span></div>
+                  <div class="bar"><span id="verifiedBar" style="width:0%"></span></div>
+                </div>
+                <div>
+                  <div class="kpi-line"><span>Attendance logged</span><span class="mono" id="attendance90">0</span></div>
+                  <div class="bar gold"><span id="attendanceBar" style="width:0%"></span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <h2>FP&amp;A Scenario Simulator</h2>
+              <p>Stress-test the impact of a <span class="mono">±100bps</span> Central Bank Rate shift on transaction velocity and estimated facility revenue.</p>
+            </div>
+            <span class="badge gold-badge">Macro sensitivity</span>
+          </div>
+          <div class="control-grid">
+            <div class="control">
+              <label for="scenarioSelect">CBR shift</label>
+              <select id="scenarioSelect">
+                <option value="-100">-100 bps</option>
+                <option value="0" selected>Base case</option>
+                <option value="100">+100 bps</option>
+              </select>
+            </div>
+            <div class="control">
+              <label>Model assumption</label>
+              <div class="toggle mono" id="scenarioAssumption">1.00x transaction velocity</div>
+            </div>
+          </div>
+          <div class="metric-grid" style="grid-template-columns:1fr 1fr; margin-top:12px">
+            <div class="card metric" style="min-height:120px;padding:16px"><div class="label">League transaction velocity</div><div class="value mono" id="velocityValue">1.00x</div><div class="delta up" id="velocityDelta">Base case</div></div>
+            <div class="card metric gold" style="min-height:120px;padding:16px"><div class="label">Estimated facility revenue</div><div class="value mono" id="scenarioRevenue">KES 0</div><div class="delta warn" id="revenueDelta">Benchmark aligned</div></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <h2>Founding Affiliation Tracker</h2>
+              <p>Season 1 founding school admissions progress against the <span class="mono">KES 50,000</span> target.</p>
+            </div>
+            <span class="badge verified" id="schoolCount">0 schools</span>
+          </div>
+          <div class="value mono" id="affiliationValue" style="font-size:34px;font-weight:800">KES 0</div>
+          <div class="bar gold" style="height:12px;margin-top:8px"><span id="affiliationBar" style="width:0%"></span></div>
+          <div class="kpi-line" style="margin-top:10px"><span>Progress to target</span><span class="mono" id="affiliationPct">0%</span></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="bottom-grid">
+      <article class="card">
+        <div class="card-head">
+          <div>
+            <h2>Multi-Tenant Data Architecture</h2>
+            <p>Simulated league-grade schema modeled for tenancy, trust enforcement, and role-scoped analytics.</p>
+          </div>
+          <span class="badge gold-badge">Full-stack view</span>
+        </div>
+        <div class="schema-grid">
+          <div class="schema"><h3>Tenancy</h3><ul><li>tenants</li><li>leagues</li><li>schools</li><li>facilities</li></ul></div>
+          <div class="schema"><h3>Operations</h3><ul><li>coaches</li><li>squads</li><li>athletes</li><li>sessions</li></ul></div>
+          <div class="schema"><h3>Finance</h3><ul><li>subscriptions</li><li>transactions</li><li>commission_wallets</li><li>budget_targets</li></ul></div>
+          <div class="schema"><h3>Trust Layer</h3><ul><li>authorized_nodes[]</li><li>node_dwell_minutes</li><li>coach_lat/lng + athlete_lat/lng</li><li>device_anchor_ok + utc_source</li></ul></div>
+          <div class="schema"><h3>Analytics</h3><ul><li>integrity_score</li><li>yield_per_hour</li><li>attendance_90d</li><li>athlete_radar_scores</li></ul></div>
+          <div class="schema"><h3>Permissions</h3><ul><li>coach = squad-only visibility</li><li>executive = league-wide scope</li><li>row-level filters</li><li>facility segmentation</li></ul></div>
+        </div>
+        <div class="trust-grid">
+          <div class="trust-step"><strong>1. Authorized node</strong><small>Coach must initialize a training node with ≥10 minutes active GPS dwell.</small></div>
+          <div class="trust-step"><strong>2. 500m fence</strong><small>Coach device must remain inside the registered node radius to stay geographically valid.</small></div>
+          <div class="trust-step"><strong>3. 50m handshake</strong><small>Coach and athlete devices must ping within 50m for proof of presence.</small></div>
+          <div class="trust-step"><strong>4. Hardware + UTC</strong><small>IMEI/MAC anchor and server-side UTC timestamps block remote logging and backdating.</small></div>
+        </div>
+        <details style="margin-top:14px">
+          <summary>Verification gate logic</summary>
+          <div class="note mono">
+            node_active = dwell_minutes &gt;= 10<br>
+            geo_valid = haversine(coach_lat, coach_lng, node_lat, node_lng) &lt;= 500m<br>
+            presence_valid = haversine(coach_lat, coach_lng, athlete_lat, athlete_lng) &lt;= 50m<br>
+            device_valid = device_anchor_ok == true<br>
+            time_valid = utc_source == "SERVER"<br><br>
+            VERIFIED = node_active AND geo_valid AND presence_valid AND device_valid AND time_valid<br>
+            FLAGGED = geo_valid AND NOT presence_valid<br>
+            REJECTED = NOT geo_valid<br>
+            integrity_score = verified_sessions / total_sessions * 100<br>
+            gold_seal = integrity_score &gt;= 90 over continuous 90-day window
+          </div>
+        </details>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div>
+            <h2>Live Session Audit Trail</h2>
+            <p>Recent sessions with node-fence, dual-ping, and device-anchor decisions.</p>
+          </div>
+          <span class="badge pending" id="reportingStatus">Manual cycles ↓ 40%</span>
+        </div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Node</th>
+              <th>Coach</th>
+              <th>Node dist</th>
+              <th>Handshake</th>
+              <th>Device</th>
+              <th>Status</th>
+              <th>Yield/hr</th>
+            </tr>
+          </thead>
+          <tbody id="sessionTable"></tbody>
+        </table>
+      </article>
+    </section>
+  </div>
+
+  <script>
+    const state = {
+      role: 'executive',
+      coachId: 'coach_kamau',
+      scenarioBps: 0
+    };
+
+    const db = {
+      tenant: { id: 'tenant_athlytica', name: 'Athlytica East Africa' },
+      league: { id: 'league_nrhl', name: 'NRHL Nairobi Region' },
+      schools: [
+        { id: 'school_biif', name: 'Big Ice Inline Federation', affiliationKES: 17500 },
+        { id: 'school_summit', name: 'The Summit School', affiliationKES: 15000 },
+        { id: 'school_ridge', name: 'The Ridge Academy', affiliationKES: 10000 }
+      ],
+      facilities: [
+        { id: 'facility_summit', name: 'The Summit', area: 'Westlands', x: 148, y: 138, trustDensity: 93, nodeLat: -1.2648, nodeLng: 36.8071 },
+        { id: 'facility_ridge', name: 'The Ridge', area: 'Runda Belt', x: 300, y: 92, trustDensity: 88, nodeLat: -1.2212, nodeLng: 36.7914 },
+        { id: 'facility_rink', name: 'National Ice Rink', area: 'Panari', x: 246, y: 220, trustDensity: 96, nodeLat: -1.3197, nodeLng: 36.8518 }
+      ],
+      coaches: [
+        { id: 'coach_kamau', name: 'Coach Kamau', squad: 'U-12 Elite Skaters', facilityId: 'facility_summit', deviceAnchor: 'IMEI-KE-AX13' },
+        { id: 'coach_auma', name: 'Coach Auma', squad: 'U-15 Speed Collective', facilityId: 'facility_ridge', deviceAnchor: 'IMEI-KE-BR22' },
+        { id: 'coach_otieno', name: 'Coach Otieno', squad: 'Scholar Track Squad', facilityId: 'facility_rink', deviceAnchor: 'IMEI-KE-CR31' }
+      ],
+      athletes: [
+        { id: 'ath_01', name: 'Amani Oloo', coachId: 'coach_kamau', attendance90: 25, sessions90: 27, radar: [8.4, 7.8, 8.2, 7.6, 9.1] },
+        { id: 'ath_02', name: 'Jabari Njoroge', coachId: 'coach_auma', attendance90: 23, sessions90: 26, radar: [7.9, 8.5, 8.0, 8.3, 8.7] },
+        { id: 'ath_03', name: 'Tendo Wafula', coachId: 'coach_otieno', attendance90: 28, sessions90: 29, radar: [8.7, 8.4, 7.9, 8.2, 9.3] }
+      ],
+      monthly: [
+        { month: 'Jan', hours: 54.5, actualRate: 4720 },
+        { month: 'Feb', hours: 58.0, actualRate: 4890 },
+        { month: 'Mar', hours: 62.0, actualRate: 5155 },
+        { month: 'Apr', hours: 61.5, actualRate: 4988 },
+        { month: 'May', hours: 65.0, actualRate: 5238 }
+      ],
+      sessions: [
+        { id: 's1', facilityId: 'facility_summit', coachId: 'coach_kamau', coachLat: -1.2651, coachLng: 36.8065, athleteLat: -1.2650, athleteLng: 36.8068, dwellMins: 14, deviceAnchorOk: true, utcSource: 'SERVER', hours: 1.5, actualRevenue: 7350, athletes: 14, date: '2026-05-02T16:00:00Z' },
+        { id: 's2', facilityId: 'facility_summit', coachId: 'coach_kamau', coachLat: -1.2649, coachLng: 36.8075, athleteLat: -1.2657, athleteLng: 36.8084, dwellMins: 12, deviceAnchorOk: true, utcSource: 'SERVER', hours: 1.0, actualRevenue: 4200, athletes: 12, date: '2026-05-01T15:00:00Z' },
+        { id: 's3', facilityId: 'facility_ridge', coachId: 'coach_auma', coachLat: -1.2217, coachLng: 36.7924, athleteLat: -1.2219, athleteLng: 36.7921, dwellMins: 18, deviceAnchorOk: true, utcSource: 'SERVER', hours: 1.5, actualRevenue: 7950, athletes: 16, date: '2026-05-02T14:30:00Z' },
+        { id: 's4', facilityId: 'facility_ridge', coachId: 'coach_auma', coachLat: -1.2269, coachLng: 36.7831, athleteLat: -1.2267, athleteLng: 36.7828, dwellMins: 11, deviceAnchorOk: true, utcSource: 'SERVER', hours: 1.5, actualRevenue: 6750, athletes: 15, date: '2026-04-30T14:30:00Z' },
+        { id: 's5', facilityId: 'facility_rink', coachId: 'coach_otieno', coachLat: -1.3196, coachLng: 36.8521, athleteLat: -1.3197, athleteLng: 36.8519, dwellMins: 16, deviceAnchorOk: true, utcSource: 'SERVER', hours: 2.0, actualRevenue: 10800, athletes: 18, date: '2026-05-02T17:00:00Z' },
+        { id: 's6', facilityId: 'facility_rink', coachId: 'coach_otieno', coachLat: -1.3131, coachLng: 36.8574, athleteLat: -1.3132, athleteLng: 36.8575, dwellMins: 9, deviceAnchorOk: false, utcSource: 'SERVER', hours: 1.0, actualRevenue: 4300, athletes: 10, date: '2026-05-01T17:00:00Z' }
+      ]
+    };
+
+    const fmtKES = n => `KES ${Math.round(n).toLocaleString('en-KE')}`;
+    const pct = n => `${n.toFixed(1)}%`;
+
+    function haversineMeters(lat1, lon1, lat2, lon2) {
+      const R = 6371e3;
+      const toRad = d => d * Math.PI / 180;
+      const φ1 = toRad(lat1), φ2 = toRad(lat2), Δφ = toRad(lat2 - lat1), Δλ = toRad(lon2 - lon1);
+      const a = Math.sin(Δφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)**2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+
+    function statusMeta(session) {
+      if (!session.geoValid) return { label: 'REJECTED', className: 'unverified', weight: 0 };
+      if (session.geoValid && !session.presenceValid) return { label: 'FLAGGED', className: 'pending', weight: 0 };
+      if (!session.deviceValid || !session.nodeActive || !session.timeValid) return { label: 'PENDING', className: 'pending', weight: 0 };
+      return { label: 'VERIFIED', className: 'verified', weight: 1 };
+    }
+
+    function enrichSession(session) {
+      const facility = db.facilities.find(f => f.id === session.facilityId);
+      const coach = db.coaches.find(c => c.id === session.coachId);
+      const nodeDistance = haversineMeters(session.coachLat, session.coachLng, facility.nodeLat, facility.nodeLng);
+      const handshakeDistance = haversineMeters(session.coachLat, session.coachLng, session.athleteLat, session.athleteLng);
+      const nodeActive = session.dwellMins >= 10;
+      const geoValid = nodeDistance <= 500;
+      const presenceValid = handshakeDistance <= 50;
+      const deviceValid = session.deviceAnchorOk === true;
+      const timeValid = session.utcSource === 'SERVER';
+      const meta = statusMeta({ nodeActive, geoValid, presenceValid, deviceValid, timeValid });
+      const yieldPerHour = session.actualRevenue / session.hours;
+      return { ...session, facility, coach, nodeDistance, handshakeDistance, nodeActive, geoValid, presenceValid, deviceValid, timeValid, status: meta.label, statusClass: meta.className, trustWeight: meta.weight, yieldPerHour };
+    }
+
+    function scopedSessions() {
+      const all = db.sessions.map(enrichSession);
+      return state.role === 'executive' ? all : all.filter(s => s.coachId === state.coachId);
+    }
+
+    function scopedAthletes() {
+      return state.role === 'executive' ? db.athletes : db.athletes.filter(a => a.coachId === state.coachId);
+    }
+
+    function rollup() {
+      const sessions = scopedSessions();
+      const totalHours = sessions.reduce((a,b) => a + b.hours, 0);
+      const actualRevenue = sessions.reduce((a,b) => a + b.actualRevenue, 0);
+      const budgetRevenue = totalHours * 5000;
+      const verifiedSessions = sessions.filter(s => s.status === 'VERIFIED').length;
+      const handshakeValid = sessions.filter(s => s.presenceValid).length;
+      const integrity = sessions.length ? (verifiedSessions / sessions.length) * 100 : 0;
+      const handshakeRate = sessions.length ? (handshakeValid / sessions.length) * 100 : 0;
+      const yieldPerHour = totalHours ? actualRevenue / totalHours : 0;
+      const athletes = scopedAthletes();
+      const attendance90 = athletes.reduce((a,b) => a + b.attendance90, 0);
+      const sessions90 = athletes.reduce((a,b) => a + b.sessions90, 0);
+      const consistency = sessions90 ? (attendance90 / sessions90) * 100 : 0;
+      const goldEligible = integrity >= 90 && consistency >= 90;
+      return { sessions, totalHours, actualRevenue, budgetRevenue, verifiedSessions, handshakeValid, integrity, handshakeRate, yieldPerHour, attendance90, sessions90, consistency, athletes, goldEligible };
+    }
+
+    function buildMetricGrid(data) {
+      const variance = data.budgetRevenue ? ((data.actualRevenue - data.budgetRevenue) / data.budgetRevenue) * 100 : 0;
+      const cards = [
+        { label:'Revenue yield', value:fmtKES(data.yieldPerHour), delta:`${variance >= 0 ? '+' : ''}${variance.toFixed(1)}% vs target`, cls: variance >= 0 ? 'up':'warn' },
+        { label:'Integrity score', value:pct(data.integrity), delta:`${data.verifiedSessions}/${data.sessions.length} sessions fully verified`, cls: data.integrity >= 90 ? 'good':'warn', gold:true },
+        { label:'Dual-ping compliance', value:pct(data.handshakeRate), delta:`${data.handshakeValid}/${data.sessions.length} sessions within 50m`, cls: data.handshakeRate >= 90 ? 'good':'warn' },
+        { label:'Reporting status', value:'40%', delta:'Manual cycles reduced', cls:'good' },
+        { label:'Gold seal gate', value:data.goldEligible ? 'Active' : 'Pending', delta:'90% integrity + 90-day continuity', cls:data.goldEligible ? 'good':'warn', gold:true }
+      ];
+      document.getElementById('metricGrid').innerHTML = cards.map(c => `
+        <article class="card metric ${c.gold ? 'gold':''}">
+          <div class="label">${c.label}</div>
+          <div class="value ${c.value.includes('KES') ? 'mono':''}">${c.value}</div>
+          <div class="delta ${c.cls}">${c.delta}</div>
+        </article>`).join('');
+    }
+
+    function drawYieldChart() {
+      const svg = document.getElementById('yieldChart');
+      const data = db.monthly;
+      const W = 760, H = 330, m = {t:20,r:60,b:42,l:60};
+      const cw = W - m.l - m.r, ch = H - m.t - m.b;
+      const maxKES = Math.max(...data.map(d => Math.max(d.hours * 5000, d.hours * d.actualRate))) * 1.18;
+      const xStep = cw / data.length;
+      let out = `<rect x="0" y="0" width="${W}" height="${H}" fill="transparent"/>`;
+      for(let i=0;i<=4;i++){
+        const y = m.t + (ch/4)*i;
+        const val = Math.round(maxKES - (maxKES/4)*i);
+        out += `<line x1="${m.l}" y1="${y}" x2="${W-m.r}" y2="${y}" stroke="rgba(148,163,184,.16)" />`;
+        out += `<text x="10" y="${y+4}" fill="#94a3b8" font-size="11" font-family="JetBrains Mono">${Math.round(val/1000)}k</text>`;
+      }
+      out += `<text x="${W-45}" y="18" fill="#a78bfa" font-size="11" font-family="JetBrains Mono">Attain%</text>`;
+      const budgetPts=[]; const attainPts=[];
+      data.forEach((d,i)=>{
+        const actual = d.hours * d.actualRate;
+        const budget = d.hours * 5000;
+        const attain = (actual / budget) * 100;
+        const x = m.l + xStep*i + xStep/2;
+        const bw = 42;
+        const ay = m.t + ch - (actual/maxKES)*ch;
+        const by = m.t + ch - (budget/maxKES)*ch;
+        const attY = m.t + ch - ((attain-88)/20)*ch;
+        budgetPts.push([x, by]); attainPts.push([x, attY]);
+        out += `<rect x="${x-bw/2}" y="${ay}" width="${bw}" height="${m.t+ch-ay}" rx="10" fill="rgba(8,217,255,.75)"/>`;
+        out += `<text x="${x}" y="${H-14}" text-anchor="middle" fill="#cbd5e1" font-size="12">${d.month}</text>`;
+      });
+      out += `<path d="M ${budgetPts.map(p=>p.join(',')).join(' L ')}" fill="none" stroke="${getComputedStyle(document.documentElement).getPropertyValue('--gold').trim()}" stroke-width="3" stroke-dasharray="7 6"/>`;
+      out += `<path d="M ${attainPts.map(p=>p.join(',')).join(' L ')}" fill="none" stroke="#a78bfa" stroke-width="3"/>`;
+      budgetPts.forEach(p=> out += `<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="${getComputedStyle(document.documentElement).getPropertyValue('--gold').trim()}"/>`);
+      attainPts.forEach(p=> out += `<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#a78bfa"/>`);
+      svg.innerHTML = out;
+    }
+
+    function drawHeatmap(data) {
+      const svg = document.getElementById('heatmap');
+      const facilities = data.sessions.reduce((acc,s)=>{
+        if(!acc[s.facilityId]) acc[s.facilityId] = {verified:0,total:0, flagged:0};
+        acc[s.facilityId].total += 1;
+        if(s.status === 'VERIFIED') acc[s.facilityId].verified += 1;
+        if(s.status === 'FLAGGED' || s.status === 'PENDING') acc[s.facilityId].flagged += 1;
+        return acc;
+      }, {});
+      let out = `
+        <defs>
+          <radialGradient id="pulseBlue"><stop offset="0%" stop-color="rgba(8,217,255,.9)"/><stop offset="100%" stop-color="rgba(8,217,255,0)"/></radialGradient>
+          <radialGradient id="pulseGold"><stop offset="0%" stop-color="rgba(255,184,136,.9)"/><stop offset="100%" stop-color="rgba(255,184,136,0)"/></radialGradient>
+        </defs>
+        <rect x="18" y="18" width="444" height="274" rx="26" fill="rgba(255,255,255,.02)" stroke="rgba(148,163,184,.14)"/>
+        <path d="M82,214 C140,116 206,104 262,124 C302,138 352,102 404,130" fill="none" stroke="rgba(148,163,184,.22)" stroke-width="32" stroke-linecap="round" opacity=".28"/>
+        <path d="M92,242 C152,224 212,248 254,232 C304,212 360,214 404,194" fill="none" stroke="rgba(148,163,184,.18)" stroke-width="24" stroke-linecap="round" opacity=".22"/>
+        <text x="40" y="52" fill="#94a3b8" font-size="12">Nairobi authorized node map</text>
+      `;
+      db.facilities.forEach((f, idx) => {
+        const stat = facilities[f.id] || {verified:0,total:0,flagged:0};
+        const density = stat.total ? (stat.verified / stat.total) * 100 : f.trustDensity;
+        const radius = 18 + density * 0.42;
+        const fill = idx === 0 ? 'url(#pulseBlue)' : idx === 1 ? 'url(#pulseGold)' : 'url(#pulseBlue)';
+        out += `<circle cx="${f.x}" cy="${f.y}" r="${radius}" fill="${fill}" />`;
+        out += `<circle cx="${f.x}" cy="${f.y}" r="8" fill="${idx === 1 ? '#FFB888':'#08D9FF'}" stroke="#fff" stroke-width="1.2" />`;
+        out += `<text x="${f.x+14}" y="${f.y-8}" fill="#f8fafc" font-size="13" font-weight="700">${f.name}</text>`;
+        out += `<text x="${f.x+14}" y="${f.y+10}" fill="#94a3b8" font-size="11">Trust ${density.toFixed(0)}%</text>`;
+      });
+      svg.innerHTML = out;
+
+      document.getElementById('facilityList').innerHTML = db.facilities.map(f => {
+        const related = data.sessions.filter(s => s.facilityId === f.id);
+        const verified = related.filter(s => s.status === 'VERIFIED').length;
+        const density = related.length ? (verified/related.length)*100 : f.trustDensity;
+        const flagged = related.filter(s => s.status !== 'VERIFIED').length;
+        return `<div class="facility"><div class="top"><strong>${f.name}</strong><span class="badge ${density >= 90 ? 'verified' : density >= 80 ? 'pending':'unverified'}">${density.toFixed(0)}%</span></div><small>${f.area} · ${verified}/${related.length || 0} dual-ping verified · ${flagged} exceptions</small><div class="bar"><span style="width:${density}%"></span></div></div>`;
+      }).join('');
+    }
+
+    function drawRadar(data) {
+      const svg = document.getElementById('radarChart');
+      const athlete = data.athletes[0] || db.athletes[0];
+      const labels = ['Technical','Power','Agility','IQ','Discipline'];
+      const values = athlete.radar;
+      const cx=170, cy=160, levels=5, maxR=118;
+      const angle = i => (-Math.PI/2) + i * (Math.PI*2/5);
+      let out = `<g transform="translate(0,0)">`;
+      for(let l=1;l<=levels;l++){
+        const r = maxR * (l/levels);
+        let pts='';
+        for(let i=0;i<5;i++) pts += `${cx + Math.cos(angle(i))*r},${cy + Math.sin(angle(i))*r} `;
+        out += `<polygon points="${pts}" fill="${l===levels ? 'rgba(255,255,255,.02)':'transparent'}" stroke="rgba(148,163,184,.18)"/>`;
+      }
+      for(let i=0;i<5;i++){
+        const x = cx + Math.cos(angle(i))*maxR;
+        const y = cy + Math.sin(angle(i))*maxR;
+        out += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(148,163,184,.16)"/>`;
+        out += `<text x="${cx + Math.cos(angle(i))*(maxR+26)}" y="${cy + Math.sin(angle(i))*(maxR+26)}" text-anchor="middle" fill="#cbd5e1" font-size="12">${labels[i]}</text>`;
+      }
+      let scorePts='';
+      values.forEach((v,i)=>{ scorePts += `${cx + Math.cos(angle(i))*maxR*(v/10)},${cy + Math.sin(angle(i))*maxR*(v/10)} `; });
+      out += `<polygon points="${scorePts}" fill="rgba(8,217,255,.25)" stroke="#08D9FF" stroke-width="3"/>`;
+      values.forEach((v,i)=> out += `<circle cx="${cx + Math.cos(angle(i))*maxR*(v/10)}" cy="${cy + Math.sin(angle(i))*maxR*(v/10)}" r="4" fill="#fff" stroke="#08D9FF" stroke-width="2"/>`);
+      out += `</g><g transform="translate(320,68)"><text x="0" y="0" fill="#94a3b8" font-size="12">Featured athlete</text><text x="0" y="28" fill="#fff" font-size="22" font-weight="800">${athlete.name}</text><text x="0" y="52" fill="#94a3b8" font-size="12">${db.coaches.find(c=>c.id===athlete.coachId).squad}</text>${values.map((v,i)=>`<text x="0" y="${86+i*26}" fill="#dbeafe" font-size="13">${labels[i]} <tspan fill="#fff" font-family="JetBrains Mono">${v.toFixed(1)}</tspan></text>`).join('')}</g>`;
+      svg.innerHTML = out;
+      document.getElementById('athleteSeal').textContent = data.goldEligible ? 'Gold seal active' : 'Seal pending';
+      document.getElementById('athleteSeal').className = `badge ${data.goldEligible ? 'verified':'pending'}`;
+    }
+
+    function drawRing(data) {
+      const svg = document.getElementById('consistencyRing');
+      const p = data.consistency;
+      const r = 76, c = 2*Math.PI*r, off = c*(1-p/100);
+      svg.innerHTML = `
+        <defs><linearGradient id="ringGrad" x1="0" x2="1"><stop offset="0%" stop-color="#08D9FF"/><stop offset="100%" stop-color="#FFB888"/></linearGradient></defs>
+        <circle cx="110" cy="110" r="76" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="18"/>
+        <circle cx="110" cy="110" r="76" fill="none" stroke="url(#ringGrad)" stroke-width="18" stroke-linecap="round" transform="rotate(-90 110 110)" stroke-dasharray="${c}" stroke-dashoffset="${off}"/>
+        <text x="110" y="105" text-anchor="middle" fill="#94a3b8" font-size="12">Attendance</text>
+        <text x="110" y="132" text-anchor="middle" fill="#fff" font-size="28" font-weight="800">${p.toFixed(0)}%</text>`;
+      document.getElementById('ringPercent').textContent = `${p.toFixed(1)}%`;
+      document.getElementById('verified90').textContent = data.verifiedSessions;
+      document.getElementById('attendance90').textContent = data.attendance90;
+      document.getElementById('verifiedBar').style.width = `${Math.min(100,(data.verifiedSessions / Math.max(1, data.sessions.length))*100)}%`;
+      document.getElementById('attendanceBar').style.width = `${Math.min(100,p)}%`;
+      document.getElementById('consistencyBadge').textContent = data.goldEligible ? 'Gold-seal continuity strong' : 'Continuity improving';
+      document.getElementById('consistencyBadge').className = `badge ${data.goldEligible ? 'verified':'pending'}`;
+    }
+
+    function scenarioMetrics(baseRevenue) {
+      const bps = Number(state.scenarioBps);
+      const velocity = 1 - (bps/100)*0.06;
+      const revenue = baseRevenue * (1 - (bps/100)*0.035);
+      return { velocity, revenue };
+    }
+
+    function renderScenario(baseRevenue) {
+      const { velocity, revenue } = scenarioMetrics(baseRevenue);
+      const bps = Number(state.scenarioBps);
+      document.getElementById('scenarioAssumption').textContent = `${velocity.toFixed(2)}x transaction velocity`;
+      document.getElementById('velocityValue').textContent = `${velocity.toFixed(2)}x`;
+      document.getElementById('velocityDelta').textContent = bps === 0 ? 'Base case' : `${((velocity-1)*100) >= 0 ? '+' : ''}${((velocity-1)*100).toFixed(1)}% vs base`;
+      document.getElementById('scenarioRevenue').textContent = fmtKES(revenue);
+      document.getElementById('revenueDelta').textContent = bps === 0 ? 'Benchmark aligned' : `${bps > 0 ? 'Rate-up drag on demand' : 'Rate-cut support to demand'}`;
+    }
+
+    function renderAffiliation() {
+      const total = db.schools.reduce((a,b)=>a+b.affiliationKES,0);
+      const pctVal = total / 50000 * 100;
+      document.getElementById('affiliationValue').textContent = fmtKES(total);
+      document.getElementById('affiliationBar').style.width = `${Math.min(100,pctVal)}%`;
+      document.getElementById('affiliationPct').textContent = `${pctVal.toFixed(0)}%`;
+      document.getElementById('schoolCount').textContent = `${db.schools.length} schools`;
+    }
+
+    function renderSessionsTable(data) {
+      const top = [...data.sessions].sort((a,b)=> new Date(b.date)-new Date(a.date)).slice(0,6);
+      document.getElementById('sessionTable').innerHTML = top.map(s => `
+        <tr>
+          <td><strong>${s.facility.name}</strong><br><span class="mono">dwell ${s.dwellMins}m</span></td>
+          <td>${s.coach.name}<br><span class="mono">${s.coach.deviceAnchor}</span></td>
+          <td class="mono">${Math.round(s.nodeDistance)}m</td>
+          <td><span class="badge ${s.presenceValid ? 'verified':'pending'}">${Math.round(s.handshakeDistance)}m</span></td>
+          <td><span class="badge ${s.deviceValid ? 'verified':'pending'}">${s.deviceValid ? 'anchored' : 'cooldown'}</span><br><span class="mono">${s.utcSource}</span></td>
+          <td><span class="badge ${s.statusClass}">${s.status}</span></td>
+          <td class="mono">${fmtKES(s.yieldPerHour)}</td>
+        </tr>`).join('');
+    }
+
+    function populateCoaches() {
+      document.getElementById('coachSelect').innerHTML = db.coaches.map(c => `<option value="${c.id}">${c.name} · ${c.squad}</option>`).join('');
+      document.getElementById('coachSelect').value = state.coachId;
+    }
+
+    function render() {
+      const data = rollup();
+      document.getElementById('syncTime').textContent = new Date().toISOString().slice(0,16).replace('T',' ');
+      buildMetricGrid(data);
+      drawYieldChart();
+      drawHeatmap(data);
+      drawRadar(data);
+      drawRing(data);
+      renderScenario(data.actualRevenue);
+      renderAffiliation();
+      renderSessionsTable(data);
+      document.getElementById('reportingStatus').textContent = state.role === 'executive' ? 'Manual cycles ↓ 40%' : 'Coach reporting automated';
+    }
+
+    document.getElementById('roleSelect').addEventListener('change', e => { state.role = e.target.value; render(); });
+    document.getElementById('coachSelect').addEventListener('change', e => { state.coachId = e.target.value; render(); });
+    document.getElementById('scenarioSelect').addEventListener('change', e => { state.scenarioBps = e.target.value; render(); });
+
+    populateCoaches();
+    render();
+  </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
