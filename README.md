@@ -5,7 +5,26 @@
 
 ---
 
----# [Athlytica Executive Command Center](https://www.genspark.ai/api/files/s/0nHkD7ZI)
+---01.0 // Executive Summary
+
+    How do we quantify human capital in a data-void market?   
+
+Athlytica is the Performance Intelligence Infrastructure designed to eliminate the "Invisibility Tax"—the systemic failure that renders African talent worthless because it is unverified. This Command Center provides the "Truth Layer" for institutional investors, federations, and scouts.  
+FP&A & Strategic Signals
+
+    Yield Benchmarking: Every training session is benchmarked against a KES 5,000/hr operating target to identify revenue leaks.
+
+    Macro-Sensitivity (CBR): Integrated stress-testing for ±100bps Central Bank Rate shifts and their impact on transaction velocity.
+
+    Operational Efficiency: Automated data ingestion from the "Trust Layer" has reduced manual reporting cycles by 40%.
+
+02.0 // Architecture Core
+
+    The Trust Layer: GPS-Haversine Geospatial Verification ensures every session is anchored to a registered facility.  
+
+    The Integrity Score: A numerical representation of an athlete's commitment to verified truth (0-100%).  
+
+    Live Passport: A unique, professional URL that aggregates verified historical data into a bankable asset.
 
 > **Verification-first executive intelligence for African sports.**  
 > A high-fidelity BI command center that converts grassroots session activity into finance-grade, trust-scored operational intelligence for coaches, school leadership, league operators, and institutional stakeholders. [Athlytica HQ](https://www.athlyticahq.com/)
