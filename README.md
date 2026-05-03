@@ -1,4 +1,9 @@
-# [Athlytica Executive Command Center](https://www.genspark.ai/api/files/s/0nHkD7ZI)
+# Athlytica Executive Command Center
+### Performance Intelligence & Yield Benchmarking OS
+
+[ 🚀 VIEW LIVE EXECUTIVE DASHBOARD ](https://dennislumumba.github.io/Athlytica-Executive-Command-Center)
+
+---# [Athlytica Executive Command Center](https://www.genspark.ai/api/files/s/0nHkD7ZI)
 
 > **Verification-first executive intelligence for African sports.**  
 > A high-fidelity BI command center that converts grassroots session activity into finance-grade, trust-scored operational intelligence for coaches, school leadership, league operators, and institutional stakeholders. [Athlytica HQ](https://www.athlyticahq.com/)
